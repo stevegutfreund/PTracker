@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Calendar – PTracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Google Calendar</h1>
+  {% if calendar_link %}
+  <a href="{{ calendar_link }}" class="btn btn-secondary" target="_blank" rel="noopener">Open in Google Calendar ↗</a>
+  {% endif %}
+</div>
+
+{% if not calendar_available %}
+<div class="alert alert-warning">
+  <strong>Google Calendar is not connected.</strong>
+  {% if calendar_error %}
+    <br><small>{{ calendar_error }}</small>
+  {% endif %}
+  <br>
+  To enable calendar sync: set <code>CALENDAR_ID</code> in <code>PTracker/.env</code> (and restart),
+  and put a Google OAuth <code>credentials.json</code> in the project folder. The first calendar
+  action opens a browser on this PC to approve access. Step-by-step guide, including how to create
+  a new calendar: <code>tools/README.md</code>.
+</div>
+{% else %}
+<p class="sub-text">Google Calendar is connected. Use the actions below to sync data.</p>
+{% endif %}
+
+{# ── Mark a day ───────────────────────────────────────────────────── #}
+<section class="card">
+  <h2>Mark a Day</h2>
+  {% if last_period %}
+  <p>Last period: <strong>{{ last_period.strftime('%d-%m-%Y') }}, {{ last_period|shkia|lower }}</strong></p>
+  {% else %}
+  <p class="notice">No periods recorded yet.</p>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('calendar.mark_day') }}"
+        class="inline-form">
+    <div class="form-group-inline">
+      <label for="day_number">Day number</label>
+      <input type="number" id="day_number" name="day_number" min="1" value="1" required
+             style="width:5rem">
+    </div>
+    <div class="form-group-inline">
+      <label class="checkbox-label">
+        <input type="checkbox" name="hebrew_calc" value="1" checked>
+        <span>Hebrew day calculation</span>
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary"
+            {{ 'disabled' if not calendar_available or not last_period }}>
+      Mark Day
+    </button>
+  </form>
+</section>
+
+{# ── Bulk copy ────────────────────────────────────────────────────── #}
+<section class="card">
+  <h2>Copy All Periods to Calendar</h2>
+  <p>Re-creates all calendar events for every stored period (does not remove existing events first).</p>
+  <form method="post" action="{{ url_for('calendar.copy_all') }}"
+        onsubmit="return confirm('Copy all periods to Google Calendar?')">
+    <button type="submit" class="btn btn-secondary"
+            {{ 'disabled' if not calendar_available }}>
+      Copy All to Calendar
+    </button>
+  </form>
+</section>
+
+{# ── Clear Vestot ─────────────────────────────────────────────────── #}
+<section class="card">
+  <h2>Clear Vestot from Calendar</h2>
+  <p>Removes all Vesset events from the calendar (useful before a recalculation).</p>
+  <form method="post" action="{{ url_for('calendar.clear_vestot') }}"
+        onsubmit="return confirm('Remove all Vesset events from Google Calendar?')">
+    <button type="submit" class="btn btn-warning"
+            {{ 'disabled' if not calendar_available }}>
+      Clear All Vestot
+    </button>
+  </form>
+</section>
+
+{# ── Clear everything ─────────────────────────────────────────────── #}
+<section class="card">
+  <h2>Clear All Calendar Events</h2>
+  <p class="notice">⚠ This removes <em>all</em> events (periods, Vestot, and day marks) from the calendar.</p>
+  <form method="post" action="{{ url_for('calendar.clear_all') }}"
+        onsubmit="return confirm('WARNING: This will delete ALL events from the calendar. Are you sure?')">
+    <button type="submit" class="btn btn-danger"
+            {{ 'disabled' if not calendar_available }}>
+      Clear All Events
+    </button>
+  </form>
+</section>
+
+{% endblock %}

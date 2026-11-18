@@ -1,0 +1,80 @@
+{% extends "base.html" %} {% block title %}Vestot – PTracker{% endblock %} {%
+block content %}
+<div class="page-header">
+  <h1>Vesset Calculation</h1>
+  <a href="{{ url_for('periods.list_periods') }}" class="btn btn-secondary"
+    >← Periods</a
+  >
+</div>
+
+{% if suspects %}
+<p class="sub-text">
+  Calculated from the periods of the current bloc, with the Vestot and Chumrot
+  chosen in <a href="{{ url_for('settings.index') }}">Settings</a>.
+  Dates are DD-MM-YYYY; after shkia is the night onah.
+</p>
+
+<table class="period-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Type</th>
+      <th>Date</th>
+      <th>Shkia</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in suspects %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ s.description }}</td>
+      <td class="date-cell">{{ s.date.strftime('%d-%m-%Y') }}</td>
+      <td>
+        <span
+          class="badge badge-{{ 'after' if s.date.hour >= 12 else 'before' }}"
+        >
+          {{ s.date|shkia }}</span
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if calendar_available %}
+<div class="action-bar" style="margin-top: 1.5rem">
+  <form
+    method="post"
+    action="{{ url_for('vestot.sync_calendar') }}"
+    onsubmit="
+      return confirm(
+        'This will remove previous Vesset events from the calendar and add the newly calculated ones. Continue?',
+      );
+    "
+  >
+    <button type="submit" class="btn btn-primary">
+      Sync to Google Calendar
+    </button>
+  </form>
+  {% if calendar_link %}
+  <a href="{{ calendar_link }}" class="btn btn-secondary" target="_blank" rel="noopener">Open in Google Calendar ↗</a>
+  {% endif %}
+</div>
+{% else %}
+<p class="notice">
+  Google Calendar is not configured – Vesset events cannot be synced
+  automatically.
+</p>
+{% endif %} {% else %}
+<div class="empty-state">
+  <p>No Vesset could be calculated.</p>
+  <p>
+    You need at least 2 periods in the current bloc for cycle-based
+    calculations, and at least 1 period for the 30/31-day and monthly
+    calculations.
+  </p>
+  <a href="{{ url_for('periods.add_period') }}" class="btn btn-primary"
+    >Add a period</a
+  >
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Settings – PTracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Settings</h1>
+  <a href="{{ url_for('vestot.calculate') }}" class="btn btn-secondary">Vestot →</a>
+</div>
+
+<p class="sub-text">
+  Customs differ: choose the Vestot and Chumrot you observe. Changes apply to
+  the next calculation; sync again from the Vestot page to update the calendar.
+</p>
+
+<form method="post" action="{{ url_for('settings.save') }}" class="entry-form settings-form">
+
+  <div class="form-group">
+    <label>Vestot and Chumrot</label>
+    <table class="period-table settings-table">
+      <thead>
+        <tr>
+          <th>Vesset</th>
+          <th>Observe</th>
+          {% for c in chumrot %}
+          <th title="{{ chumra_info[c][2] }}">{{ chumra_info[c][0] }}<br><small>{{ chumra_info[c][1] }}</small></th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in vestot %}
+        {% set cfg = prefs.vestot[v] %}
+        <tr data-vesset="{{ v }}">
+          <td>
+            <strong>{{ vesset_info[v][0] }}</strong> · {{ vesset_info[v][1] }}<br>
+            <small class="form-hint">{{ vesset_info[v][2] }}</small>
+          </td>
+          <td><input type="checkbox" class="vesset-enabled" name="{{ v }}.enabled" value="1"
+                     aria-label="Observe {{ vesset_info[v][1] }}" {{ 'checked' if cfg.enabled }}></td>
+          {% for c in chumrot %}
+          <td><input type="checkbox" class="vesset-chumra" name="{{ v }}.{{ c }}" value="1"
+                     aria-label="{{ chumra_info[c][1] }} for {{ vesset_info[v][1] }}" {{ 'checked' if cfg[c] }}></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <small class="form-hint">
+      {% for c in chumrot %}<strong>{{ chumra_info[c][1] }}</strong>: {{ chumra_info[c][2] }}{{ ' ' if not loop.last }}{% endfor %}
+    </small>
+  </div>
+
+  <div class="form-group">
+    <label>הפלגה שלא נעקרה – when is an older interval uprooted?</label>
+    <div class="radio-group radio-group-stacked">
+      {% for m in modes %}
+      <label class="radio-label">
+        <input type="radio" name="haflagah_uprooting" value="{{ m }}"
+               {{ 'checked' if prefs.haflagah_uprooting == m }}>
+        <span>{{ uprooting_info[m][0] }}<br><small>{{ uprooting_info[m][1] }}</small></span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Save settings</button>
+    <a href="{{ url_for('settings.index') }}" class="btn btn-secondary">Discard changes</a>
+  </div>
+</form>
+
+<script>
+  // A Chumra only applies to a Vesset that is observed.
+  document.querySelectorAll(".settings-table tbody tr").forEach(function (row) {
+    var enabled = row.querySelector(".vesset-enabled");
+    function sync() {
+      row.querySelectorAll(".vesset-chumra").forEach(function (c) { c.disabled = !enabled.checked; });
+    }
+    enabled.addEventListener("change", sync);
+    sync();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+flask>=3.0
+python-dateutil>=2.8
+# Required: the shared CalendarKit package (Google Calendar client, Hebrew dates,
+# .env loading). Separate repo - clone it next to this one so ../CalendarKit exists.
+-e ../CalendarKit

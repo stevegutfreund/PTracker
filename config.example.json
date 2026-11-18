@@ -1,0 +1,31 @@
+{
+  "language": "hebrew",
+  "vestot": {
+    "Monthly": {
+      "enabled": true,
+      "OrZarua": true,
+      "KartiUfalti": false
+    },
+    "Thirty": {
+      "enabled": true,
+      "OrZarua": true,
+      "KartiUfalti": true
+    },
+    "ThirtyOne": {
+      "enabled": true,
+      "OrZarua": false,
+      "KartiUfalti": false
+    },
+    "LastSkip": {
+      "enabled": true,
+      "OrZarua": true,
+      "KartiUfalti": false
+    },
+    "OldSkip": {
+      "enabled": true,
+      "OrZarua": false,
+      "KartiUfalti": false
+    }
+  },
+  "haflagah_uprooting": "three_shorter"
+}

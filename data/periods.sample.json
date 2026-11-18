@@ -1,0 +1,22 @@
+[
+  {
+    "date": "01-01-2024",
+    "after_shkia": false,
+    "clean_start": true
+  },
+  {
+    "date": "30-01-2024",
+    "after_shkia": true,
+    "clean_start": false
+  },
+  {
+    "date": "28-02-2024",
+    "after_shkia": false,
+    "clean_start": false
+  },
+  {
+    "date": "28-03-2024",
+    "after_shkia": true,
+    "clean_start": false
+  }
+]

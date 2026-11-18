@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if action == 'edit' else 'Add' }} Period – PTracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ 'Edit Period' if action == 'edit' else 'Add Period' }}</h1>
+  <a href="{{ url_for('periods.list_periods') }}" class="btn btn-secondary">← Back</a>
+</div>
+
+<form method="post"
+      action="{{ url_for('periods.edit_period', index=index) if action == 'edit'
+               else url_for('periods.add_period') }}"
+      class="entry-form">
+
+  {# Date #}
+  <div class="form-group">
+    <label for="date">Date</label>
+    <input type="date"
+           id="date"
+           name="date"
+           required
+           value="{{ entry.iso_date if entry else '' }}">
+    <small class="form-hint">Select the date of the period onset.</small>
+  </div>
+
+  {# Time of day #}
+  <div class="form-group">
+    <label>Time of day</label>
+    <div class="radio-group">
+      <label class="radio-label">
+        <input type="radio" name="after_shkia" value="0"
+               {{ 'checked' if not (entry and entry.after_shkia) }}>
+        <span>Before shkia</span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="after_shkia" value="1"
+               {{ 'checked' if entry and entry.after_shkia }}>
+        <span>After shkia</span>
+      </label>
+    </div>
+    <small class="form-hint">
+      After shkia means the onset was in the night onah, which belongs to the
+      next Hebrew day. Between midnight and dawn: enter the previous date,
+      after shkia.
+      This affects Vesset delta calculations.
+    </small>
+  </div>
+
+  {# Clean start #}
+  <div class="form-group">
+    <label class="checkbox-label">
+      <input type="checkbox" name="clean_start" value="1"
+             {{ 'checked' if entry and entry.clean_start }}>
+      <span>Fresh start (new counting sequence)</span>
+    </label>
+    <small class="form-hint">
+      Check this if this period begins a new counting sequence
+      (e.g., after a break, resumption of cycles, or a new marriage).
+      Vesset calculations use only periods since the last fresh start.
+    </small>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+      {{ 'Save changes' if action == 'edit' else 'Add period' }}
+    </button>
+    <a href="{{ url_for('periods.list_periods') }}" class="btn btn-secondary">Cancel</a>
+  </div>
+
+</form>
+{% endblock %}
